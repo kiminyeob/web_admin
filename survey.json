@@ -1,0 +1,8 @@
+{"message" : "일어나서 1분간 움직여주세요.",
+	"policy" : {"cancelEvent" : "EXIT_STILL", "dailySurveyTime" : {"from" : {"hour" : 9, "minute" : 0}, "to" : {"hour" : 21, "minute" : 0}}, "daysOfWeek" : ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"], "flexInterval" : {"unit" : "MINUTES", "value" : 0}, "initialDelayInDays" : 0, "minInterval" : {"unit" : "MINUTES", "value" : 60}, "timeout" : {"unit" : "MINUTES", "value" : 5}, "timeoutPolicyType" : "ALTERNATIVE_TEXT", "triggerEvent" : "ENTER_STILL"},
+	"questions" : [
+		{"altText" : "일어나서 1분간 실제로 움직이셨나요?", "options" : ["예", "아니오"],"response" : ["예"], "shouldAnswers" : true,"text" : "일어나서 1분간 움직여주세요.", "type" : "SINGLE_CHOICE"},
+		{"altText" : "일어나서 1분간 움직일 수 있는 상황/환경이었나요?", "options" : ["예", "아니오"], "response" : ["예"], "shouldAnswers" : true, "text" : "일어나서 1분간 움직일 수 있는 상황/환경인가요?", "type" : "SINGLE_CHOICE"},
+		{"options" : ["예", "아니오"], "response" : ["딱 일어나서 움직일수있는 상황이어서"], "shouldAnswers" : true, "text" : "위 두 질문에 대하여 왜 그렇게 응답하셨는지 이유를 써주세요.", "type" : "SINGLE_TEXT"},
+		{"altText" : "알림이 도착했을 때의 상황에 대하여 설명해주세요.", "options" : ["어디에 계신가요? (예. 창의관 강의실, 회의실, 카페 등)", "무얼 하고 계신가요? (예. 논문 읽기, 회의 중 등)", "누구와 있으신가요? (예. 수강생, 동료, 교수님 등)"], "response" : ["동측", "식사종료", "김현수"], "shouldAnswers" : true, "text" : "현재 상황에 대하여 설명해주세요.", "type" : "MULTIPLE_TEXTS"}
+	] , "title" : "일어날 시간입니다."}
