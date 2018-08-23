@@ -1,3 +1,15 @@
+<?php
+/*
+
+To do list
+
+1. 참여 시간 formatting
+2. 걸음 수와 거리 출력하기
+3. 날짜 취합하기
+
+*/
+?>
+
 <!DOCTYPE html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -10,13 +22,6 @@
 //ERRPR 화면 표시 여부
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
-?>
-
-
-<?php
-	//참여자 정보
-	$user_id = "dianehyunsookim@gmail.com";
-	echo "<b>".$user_id."</b>님의 설문 조사 현황입니다.<br><br>";
 ?>
 
 
@@ -46,7 +51,15 @@ echo "<br>";
 mysqli_query($db, 'set session character_set_connection=utf8mb4;');
 mysqli_query($db, 'set session character_set_results=utf8mb4;');
 mysqli_query($db, 'set session character_set_client=utf8mb4;');
+?>
 
+<?php
+	//참여자 정보 이전 페이지에서 받아서 수정해야 함
+	$user_id = "dianehyunsookim@gmail.com";
+	$user_group = "캐시워크";
+	echo "<h1>".$user_id."<h1>";
+	echo "<h2>".$user_group."</h2>";
+	echo '<hr>';
 ?>
 
 <?php //설문 조사 결과 출력하는 PART
@@ -55,6 +68,7 @@ $result = mysqli_query($db, "SELECT response, reaction_timestamp FROM survey WHE
 
 //테이블 생성
 echo '<h1>설문</h1>';
+
 echo '<table class="type09"><thead><tr>';
 echo '<th scope="cols">참여시간</th>';
 echo '<th scope="cols">문항1</th>';
@@ -84,6 +98,11 @@ while($row = mysqli_fetch_assoc($result)){ //row
 
 echo '</tbody></table>';
 mysqli_close($db);
+?>
+
+<?php
+
+echo '<h1>Data</h1>';
 
 ?>
  
