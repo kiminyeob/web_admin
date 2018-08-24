@@ -14,15 +14,21 @@ To do list
 <!DOCTYPE html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<link rel="stylesheet" type="text/css" href="mystyle.css">
+	<link rel="stylesheet" type="text/css" href="css/mystyle.css">
 	<title>MySql-PHP 연결 테스트</title>
 </head>
 <body>
 
 <?php
 	//참여자 정보 이전 페이지에서 받아서 수정해야 함
-	$user_id = "dianehyunsookim@gmail.com";
-	$user_group = "캐시워크!!!";
+	$user_id = $_GET['email'];
+	if(!empty($_GET['group'])){
+		$user_group = $_GET['group'];
+	}else{
+		$user_group = '그룹 미지정';
+	}
+
+
 
 	echo "<h1>".$user_id."<h1>";
 	echo "<h2>".$user_group."</h2>";
@@ -37,7 +43,7 @@ ini_set("display_errors", 1);
 
 <?php
 //DB 접속 정보(이후에 보안 처리 해야함)
-$db = mysqli_connect("keltpower0.kaist.ac.kr:6603", "root", "root", "my-schema"); 
+$db = mysqli_connect("keltpower0.kaist.ac.kr:6603", "root", "root", "my-schema");
 
 //Character setting 설정
 mysqli_query($db, 'set session character_set_connection=utf8mb4;');
@@ -52,7 +58,7 @@ $result = mysqli_query($db, "SELECT response, reaction_timestamp FROM survey WHE
 
 echo '<h1>설문</h1>';
 echo '<table class="type09"><thead><tr>';
-echo '<th scope="cols">참여시간</th>';
+echo '<th scope="cols">설문 참여시간</th>';
 
 $row = mysqli_fetch_assoc($result);
 $json = json_decode($row['response'], true);
