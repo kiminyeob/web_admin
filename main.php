@@ -50,6 +50,7 @@
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
+
 ?>
 
 <?php
@@ -64,6 +65,8 @@ mysqli_query($db, 'set session character_set_client=utf8mb4;');
 //실험 id(module화 할 수 있을까?)
 $experiment_uuid = "1ce4f2cfb6a944adb1584ec74301041b"; //subject
 $experiment_uuid2 = "1ce4f2cf-b6a9-44ad-b158-4ec74301041b"; //survey
+$experiment_uuid3 = "38fd7ac53ec14ec2bb4720ea7bf00f46"; //ai-flagship
+$experiment_uuid4 = "38fd7ac5-3ec1-4ec2-bb47-20ea7bf00f46";
 //$case = $_GET['case'];
 
 if(!empty($_GET['keyword'])){
@@ -86,7 +89,7 @@ if(!empty($_GET['keyword'])){
 
 //쿼리 날리기
 
-switch($case){
+switch($case){//종합 정보
 	case 1: //no condition
 		$result = mysqli_query($db, "SELECT participated_timestamp, experiment_group, name, gender, birth_date, email, phone_number FROM subject WHERE experiment_uuid ='$experiment_uuid' ORDER BY participated_timestamp");
 		break;
@@ -104,7 +107,7 @@ switch($case){
 		break;
 }
 
-switch($case){
+switch($case){//설문 결과
 	case 1: //no condition
 		$result2 = mysqli_query($db, "SELECT response, reaction_timestamp, email, experiment_group FROM survey WHERE experiment_uuid ='$experiment_uuid2' ORDER BY email");
 		break;
@@ -112,9 +115,22 @@ switch($case){
 		$result2 = mysqli_query($db, "SELECT response, reaction_timestamp, email, experiment_group FROM survey WHERE experiment_uuid ='$experiment_uuid2' and experiment_group ='$group' ORDER BY email");
 		break;
 	case 5: //지정 (아직)
-		$result2 =mysqli_query($db, "SELECT response, reaction_timestamp, email, experiment_group FROM survey WHERE experiment_uuid ='$experiment_uuid2' and email IN (SELECT email, participated_timestamp FROM subject WHERE name LIKE '%$keyword%' ORDER BY participated_timestamp)");
+		$result2 = mysqli_query($db, "SELECT response, reaction_timestamp, email, experiment_group FROM survey WHERE experiment_uuid ='$experiment_uuid2' and email IN (SELECT email FROM subject WHERE name LIKE '%$keyword%' ORDER BY participated_timestamp)");
 		break;
 }
+
+switch($case){//걸음 결과
+	case 1: //no condition
+		$result4 =mysqli_query($db, "SELECT email, experiment_group, FROM_UNIXTIME(start_time/1000,'%Y%m%d') as start_time, sum(value) as value, type FROM physical_status WHERE type IN ('TotalActivityDistance', 'TotalActivityStepCounts', 'TotalDistance', 'TotalStepCounts') and experiment_uuid ='$experiment_uuid4' GROUP BY type, FROM_UNIXTIME(start_time/1000,'%Y%m%d') ORDER BY start_time, type");
+		break;
+	case 3: //only group (아직)
+		$result4 =mysqli_query($db, "SELECT email, experiment_group, FROM_UNIXTIME(start_time/1000,'%Y%m%d') as start_time, sum(value) as value, type FROM physical_status WHERE type IN ('TotalActivityDistance', 'TotalActivityStepCounts', 'TotalDistance', 'TotalStepCounts') and experiment_group ='$group' and experiment_uuid ='$experiment_uuid4' GROUP BY type, FROM_UNIXTIME(start_time/1000,'%Y%m%d') ORDER BY start_time, type");
+		break;
+	case 5: //지정 (아직)
+		$result4 =mysqli_query($db, "SELECT email, experiment_group, FROM_UNIXTIME(start_time/1000,'%Y%m%d') as start_time, sum(value) as value, type FROM physical_status WHERE type IN ('TotalActivityDistance', 'TotalActivityStepCounts', 'TotalDistance', 'TotalStepCounts') and experiment_uuid ='$experiment_uuid4' and email IN (SELECT email FROM subject WHERE name LIKE '%$keyword%') GROUP BY type, FROM_UNIXTIME(start_time/1000,'%Y%m%d') ORDER BY start_time, type");
+		break;
+}
+
 
 ?>
 		<br>
@@ -222,8 +238,118 @@ switch($case){
 
 				</div>
 				<div id="tabContent02" class="tabPage">
-					두번째 탭 내용
+
+
+			<br><br>
+			<div style="border:1px; text-align:center; clear: both">
+				<form action="main.php" method="get">
+					<b>그 룹:</b>
+					<input type="radio" name="group" value="캐시워크">캐시워크
+					<input type="radio" name="group" value="워커">워커
+					<input type="radio" name="group" value="피트머니">피트머니
+					<input type="radio" name="group" value="통제집단">통제집단
+					<br><br>
+
+					<b>이름검색:</b>
+					<input type="text" name="keyword" />
+					<br><br>
+
+					<input type="submit" name="submit" value="submit2">
+				</form>
+			</div>
+			<br><br>
+ 
+<?php //두번째
+					echo '<table class="type09" id="table_result3">'.'<thead>'.'<tr>';
+				    echo '<th scope="cols">번호</th>';       
+				    echo '<th scope="cols">이름</th>';       
+				    echo '<th scope="cols">그룹</th>';   
+				    echo '<th scope="cols">날짜</th>';
+				    echo '<th scope="cols">타입</th>';
+				    echo '<th scope="cols">값</th>';
+				    /*
+				    echo '<th scope="cols">걸음수(보정)</th>';
+				    echo '<th scope="cols">거리</th>';
+				    echo '<th scope="cols">걸음수</th>';
+				    */
+				    echo '</tr>'.'</thead>';
+
+				    /*
+				    echo '<tbody>';
+				    $count3 = 1;
+				    $flag = 0;
+				    while($row4 = mysqli_fetch_assoc($result4)){ //row4는 걸음과 거리
+				    	if ($flag == 0){
+					    	echo '<tr>';
+							echo '<th scope="row">'.$count3.'</th>';
+
+							$email_temp2 = $row4['email'];
+							$result5 = mysqli_query($db, "SELECT name FROM subject WHERE experiment_uuid ='$experiment_uuid3' and email='$email_temp2'"); //result 5는 이메일을 통해서 사용자 이름을 찾기 위함
+							$row5 = mysqli_fetch_assoc($result5);
+							echo '<td>'.$row5['name'].'</td>';
+
+							$experiment_group2 = '그룹 미지정';
+							if(!empty($row4['experiment_group'])){
+								$experiment_group2 = $row4['experiment_group'];
+							}
+
+							echo '<td>'.$experiment_group2.'</td>';
+							echo '<td>'.$row4['start_time'].'</td>';
+							echo '<td>'.$row4['value'].'</td>';
+						}
+						else{
+							echo '<td>'.$row4['value'].'</td>';
+							if ($flag == 3){
+								$flag = -1;
+								$count3 = $count3+1;
+							}
+						}
+						$flag = $flag +1;
+					}
+					echo '</tr>';
+					echo '</tbody></table>';
+					*/
+
+				    echo '<tbody>';
+				    $count3 = 1;
+				    while($row4 = mysqli_fetch_assoc($result4)){ //row4는 걸음과 거리
+					    echo '<tr>';
+						echo '<th scope="row">'.$count3.'</th>';
+
+						$email_temp2 = $row4['email'];
+						$result5 = mysqli_query($db, "SELECT name FROM subject WHERE experiment_uuid ='$experiment_uuid3' and email='$email_temp2'"); //result 5는 이메일을 통해서 사용자 이름을 찾기 위함
+						$row5 = mysqli_fetch_assoc($result5);
+						echo '<td>'.$row5['name'].'</td>';
+
+						$experiment_group2 = '그룹 미지정';
+						if(!empty($row4['experiment_group'])){
+							$experiment_group2 = $row4['experiment_group'];
+						}
+
+						echo '<td>'.$experiment_group2.'</td>';
+						echo '<td>'.$row4['start_time'].'</td>';
+						echo '<td>'.$row4['type'].'</td>';
+						echo '<td>'.$row4['value'].'</td>';
+						$count3 = $count3+1;
+					}
+
+					echo '</tr>';
+					echo '</tbody></table>';
+?>
 				</div>
+
+			<script src="js/bootstrap.min_1.js" type="text/javascript" charset='euc-kr'></script>
+			<script src="js/FileSaver.min.js" type="text/javascript" charset='euc-kr'></script>
+			<script src="js/jquery-3.1.1.min.js" type="text/javascript" charset='euc-kr'></script>
+			<script src="js/tableexport.min.js" type="text/javascript" charset='euc-kr'></script>
+
+			<div style="text-align:center; clear: both">
+				<script>
+					$('#table_result3').tableExport();
+				</script>
+			</div>
+
+
 				<div id="tabContent03" class="tabPage">
 
 <br><br>

@@ -15,7 +15,7 @@ To do list
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<link rel="stylesheet" type="text/css" href="css/mystyle.css">
-	<title>MySql-PHP 연결 테스트</title>
+	<title>관리자 페이지(개인별)</title>
 </head>
 <body>
 
@@ -37,8 +37,10 @@ To do list
 
 <?php
 //ERRPR 화면 표시 여부
+/*
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
+*/
 ?>
 
 <?php
@@ -51,7 +53,17 @@ mysqli_query($db, 'set session character_set_results=utf8mb4;');
 mysqli_query($db, 'set session character_set_client=utf8mb4;');
 
 //쿼리 날리기
-$result = mysqli_query($db, "SELECT response, reaction_timestamp FROM survey WHERE email='$user_id'");
+
+$experiment_uuid = "1ce4f2cfb6a944adb1584ec74301041b"; //subject
+$experiment_uuid2 = "1ce4f2cf-b6a9-44ad-b158-4ec74301041b"; //survey
+$experiment_uuid3 = "38fd7ac53ec14ec2bb4720ea7bf00f46"; //ai-flagship
+$experiment_uuid4 = "38fd7ac5-3ec1-4ec2-bb47-20ea7bf00f46";
+
+$result = mysqli_query($db, "SELECT response, reaction_timestamp FROM survey WHERE experiment_uuid ='$experiment_uuid2' and email='$user_id'");
+/*
+$result2 =mysqli_query($db, "SELECT email, experiment_group, FROM_UNIXTIME(start_time/1000,'%Y%m%d') as start_time, sum(value) as value, type FROM physical_status WHERE type IN ('TotalActivityDistance', 'TotalActivityStepCounts', 'TotalDistance', 'TotalStepCounts') and experiment_uuid ='$experiment_uuid4' and email='$user_id' GROUP BY type, FROM_UNIXTIME(start_time/1000,'%Y%m%d') ORDER BY start_time, type");
+*/
+$result2 =mysqli_query($db, "SELECT email, experiment_group, FROM_UNIXTIME(start_time/1000,'%Y%m%d') as start_time, sum(value) as value, type FROM physical_status WHERE type IN ('TotalActivityDistance', 'TotalActivityStepCounts', 'TotalDistance', 'TotalStepCounts') and experiment_uuid ='$experiment_uuid4' and email='aiflagship.iclab@gmail.com' GROUP BY type, FROM_UNIXTIME(start_time/1000,'%Y%m%d') ORDER BY start_time, type");
 ?>
 
 <?php //설문 조사 결과 출력하는 PART //테이블 생성
@@ -93,6 +105,30 @@ mysqli_close($db);
 
 <?php //신체 활동 결과 출력
 echo '<h1>Data</h1>';
+
+echo '<table class="type09" id="table_result3">'.'<thead>'.'<tr>';
+  
+echo '<th scope="cols">날짜</th>';
+echo '<th scope="cols">타입</th>';
+echo '<th scope="cols">값</th>';
+/*
+echo '<th scope="cols">걸음수(보정)</th>';
+echo '<th scope="cols">거리</th>';
+echo '<th scope="cols">걸음수</th>';
+*/
+echo '</tr>'.'</thead>';
+
+echo '<tbody>';
+while($row2 = mysqli_fetch_assoc($result2)){ //row2는 걸음과 거리
+	echo '<tr>';
+	echo '<th scope="row">'.$row2['start_time'].'</th>';
+	echo '<td>'.$row2['type'].'</td>';
+	echo '<td>'.$row2['value'].'</td>';
+}
+echo '</tr>';
+echo '</tbody></table>';
+
+
 ?>
  
 </body>
